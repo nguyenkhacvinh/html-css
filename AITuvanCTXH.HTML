@@ -1,24 +1,27 @@
+<!--
+  Hộp chat Tư vấn Công tác xã hội tại Việt Nam
+  Phiên bản Full Page, Key AI đã được nhúng sẵn để người dùng chat ngay lập tức.
+-->
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbox Công tác xã hội</title>
+    <title>Chatbox Công tác xã hội - Sẵn sàng Chat</title>
     <!-- Tải Tailwind CSS CDN để tạo giao diện đẹp và responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Container chính, không còn cố định (fixed) nữa */
+        /* Container chính, căn giữa nội dung trên trang */
         #chat-main-container {
             font-family: 'Inter', sans-serif;
-            /* Căn giữa nội dung trên màn hình */
             display: flex;
             justify-content: center;
             padding: 24px;
         }
 
-        /* Khung tin nhắn - Tăng chiều cao lên để tận dụng không gian trang */
+        /* Khung tin nhắn */
         #chat-messages {
-            height: 400px; /* Tăng chiều cao mặc định */
+            height: 550px; /* Tăng chiều cao để tận dụng không gian */
             overflow-y: auto;
             scroll-behavior: smooth;
         }
@@ -70,39 +73,41 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1.0); }
         }
+
+        /* Ẩn thanh cuộn trên một số trình duyệt, ưu tiên thiết kế tối giản */
+        #chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chat-messages::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
     <div id="chat-main-container" class="w-full">
         <!-- Wrapper giới hạn chiều rộng và căn giữa -->
-        <div class="w-full max-w-lg">
-            <h1 class="text-3xl font-extrabold text-blue-800 mb-6 text-center">Tư vấn Công tác Xã hội</h1>
+        <div class="w-full max-w-xl">
+            <h1 class="text-3xl font-extrabold text-blue-800 mb-6 text-center">Hệ thống Tư vấn Công tác Xã hội</h1>
 
-            <!-- Cửa sổ Chat (Luôn hiển thị) -->
+            <!-- Cửa sổ Chat -->
             <div id="chat-window" class="w-full bg-white rounded-xl overflow-hidden shadow-2xl">
 
-                <!-- Header (Không có nút đóng) -->
+                <!-- Header -->
                 <div class="bg-blue-600 text-white p-4 flex items-center rounded-t-xl">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                     </svg>
-                    <h3 class="text-xl font-semibold">Trợ lý Chuyên gia CTXH</h3>
-                </div>
-
-                <!-- Khung nhập API Key -->
-                <div id="api-key-setup" class="p-4 bg-yellow-50 text-gray-800 text-sm">
-                    <p class="font-bold mb-2">Cài đặt Khóa AI</p>
-                    <input type="password" id="api-key-input" placeholder="Nhập KeyAI của bạn" class="w-full p-2 border border-gray-300 rounded-md mb-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                    <button id="save-key-button" class="w-full bg-green-500 hover:bg-green-600 text-white py-1.5 rounded-md font-medium transition duration-150">Lưu Khóa AI</button>
-                    <p class="mt-2 text-xs text-center text-gray-500">Key sẽ được lưu cục bộ trong trình duyệt.</p>
+                    <h3 class="text-xl font-semibold">Trợ lý Chuyên gia CTXH (Đã kết nối)</h3>
                 </div>
 
                 <!-- Khung tin nhắn -->
                 <div id="chat-messages" class="flex flex-col p-4">
                     <!-- Tin nhắn chào mừng -->
                     <div class="ai-message self-start">
-                        Chào bạn! Tôi là Trợ lý Tư vấn Công tác Xã hội, sẵn sàng hỗ trợ bạn về các vấn đề xã hội tại Việt Nam.
+                        Chào bạn! Tôi là Trợ lý Tư vấn Công tác Xã hội, đã sẵn sàng hỗ trợ bạn về các vấn đề xã hội tại Việt Nam. Bạn có câu hỏi nào không?
                     </div>
                 </div>
 
@@ -110,11 +115,9 @@
                 <div class="p-4 border-t border-gray-200">
                     <div class="flex">
                         <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn..."
-                            class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            disabled>
+                            class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <button id="send-button"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg disabled:opacity-50"
-                            disabled>
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-lg disabled:opacity-50">
                             Gửi
                         </button>
                     </div>
@@ -124,43 +127,24 @@
     </div>
 
     <script>
-        // Các biến toàn cục (Global Variables)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Key AI đã được nhúng trực tiếp vào đây
+        const apiKey = "AIzaSyCV-q8Xv1anjYGp6wUbXDz5gWwXU2EvigE";
 
+        // Các biến toàn cục
         const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
         const MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
-
-        // System Prompt: Thiết lập vai trò chuyên gia CTXH Việt Nam
         const systemPrompt = 'Bạn là một chuyên gia tư vấn trong lĩnh vực Công tác xã hội tại Việt Nam. Trả lời các câu hỏi của người dùng một cách chính xác, thân thiện, và dựa trên luật pháp cũng như thực tế xã hội Việt Nam. Duy trì một giọng văn chuyên nghiệp, đồng cảm và hỗ trợ. Khi không chắc chắn về thông tin, hãy nói rõ rằng bạn cần kiểm tra thêm và không đưa ra lời khuyên y tế hoặc pháp lý thay thế chuyên gia.';
 
-        let apiKey = '';
         let chatHistory = [];
         let isSending = false;
 
         // Lấy các phần tử DOM
-        let userInput, chatMessages, sendButton, saveKeyButton, apiKeyInput, apiKeySetup;
+        let userInput, chatMessages, sendButton;
 
         function initializeElements() {
             userInput = document.getElementById('user-input');
             chatMessages = document.getElementById('chat-messages');
             sendButton = document.getElementById('send-button');
-            saveKeyButton = document.getElementById('save-key-button');
-            apiKeyInput = document.getElementById('api-key-input');
-            apiKeySetup = document.getElementById('api-key-setup');
-
-            // Xử lý nút lưu key
-            if (saveKeyButton) {
-                saveKeyButton.addEventListener('click', () => {
-                    const key = apiKeyInput.value.trim();
-                    if (key) {
-                        localStorage.setItem('geminiApiKey', key);
-                        apiKey = key;
-                        initChat();
-                    } else {
-                        displayMessage('Vui lòng nhập Key AI.', 'ai');
-                    }
-                });
-            }
 
             // Xử lý gửi tin nhắn
             if (sendButton) sendButton.addEventListener('click', sendMessage);
@@ -169,51 +153,11 @@
                     sendMessage();
                 }
             });
-        }
 
-        // --- Xử lý Giao diện và API Key ---
-
-        function loadApiKey() {
-            const storedKey = localStorage.getItem('geminiApiKey');
-            if (storedKey) {
-                apiKey = storedKey;
-                if (apiKeyInput) apiKeyInput.value = storedKey;
-                if (apiKeySetup) apiKeySetup.classList.add('hidden');
-                if (userInput) userInput.disabled = false;
-                if (sendButton) sendButton.disabled = false;
-            } else {
-                if (apiKeySetup) apiKeySetup.classList.remove('hidden');
-                if (userInput) userInput.disabled = true;
-                if (sendButton) sendButton.disabled = true;
-                // Hiển thị thông báo khi chatbox mở lần đầu mà chưa có key
-                if (chatMessages && chatMessages.children.length <= 1) {
-                    displayMessage('Vui lòng nhập Khóa AI của bạn để bắt đầu trò chuyện.', 'ai');
-                }
-            }
-        }
-
-        function initChat() {
-            loadApiKey();
-            if (apiKey) {
-                 if (apiKeySetup) apiKeySetup.classList.add('hidden');
-                 if (userInput) {
-                     userInput.disabled = false;
-                     userInput.placeholder = "Nhập câu hỏi của bạn...";
-                 }
-                 if (sendButton) sendButton.disabled = false;
-
-                 // Khởi tạo lịch sử chat
-                 if (chatHistory.length === 0) {
-                     // Tin nhắn chào mừng mặc định đã có trong HTML, thêm vào lịch sử chat
-                     chatHistory.push({ role: "model", parts: [{ text: "Chào bạn! Tôi là Trợ lý Tư vấn Công tác Xã hội, sẵn sàng hỗ trợ bạn về các vấn đề xã hội tại Việt Nam." }] });
-                 }
-            } else {
-                 if (apiKeySetup) apiKeySetup.classList.remove('hidden');
-                 if (userInput) {
-                     userInput.disabled = true;
-                     userInput.placeholder = "Vui lòng nhập Key AI trước";
-                 }
-            }
+             // Khởi tạo lịch sử chat (tin nhắn chào mừng)
+             if (chatHistory.length === 0) {
+                 chatHistory.push({ role: "model", parts: [{ text: "Chào bạn! Tôi là Trợ lý Tư vấn Công tác Xã hội, đã sẵn sàng hỗ trợ bạn về các vấn đề xã hội tại Việt Nam. Bạn có câu hỏi nào không?" }] });
+             }
         }
 
         // --- Xử lý Tin nhắn và Giao tiếp API ---
@@ -288,7 +232,7 @@
 
             const payload = {
                 contents: contents,
-                // Bật Google Search Grounding
+                // Bật Google Search Grounding để lấy thông tin thực tế xã hội Việt Nam
                 tools: [{ "google_search": {} }],
                 systemInstruction: {
                     parts: [{ text: systemPrompt }]
@@ -333,7 +277,7 @@
                 hideLoading();
                 // Xóa tin nhắn cuối cùng của người dùng khỏi lịch sử để tránh lặp lỗi
                 chatHistory.pop();
-                displayMessage('Xin lỗi, đã xảy ra lỗi trong quá trình xử lý. Vui lòng kiểm tra Key AI và thử lại.', 'ai');
+                displayMessage('Xin lỗi, đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại.', 'ai');
 
             } finally {
                 isSending = false;
@@ -348,7 +292,6 @@
         // Chờ cho DOM tải xong trước khi khởi tạo
         document.addEventListener('DOMContentLoaded', () => {
             initializeElements();
-            initChat();
         });
     </script>
 </body>
