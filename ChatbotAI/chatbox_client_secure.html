@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbox Công tác xã hội</title>
+    <!-- Tải Tailwind CSS CDN để tạo giao diện đẹp và responsive -->
+  <!-- 
+    PHẦN B: HTML/JS (Dán vào Block HTML/Widget)
+    Mã này an toàn vì KHÔNG chứa Key AI.
+    Nó chỉ gửi yêu cầu đến PROXY_ENDPOINT trên server của bạn.
+-->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" type="text/css" href="/chatbox_styles_secured.css">
+<div class="ctxh-chatbox-wrapper">
+    <div class="ctxh-chatbox-window">
+        <!-- Header -->
+        <div class="ctxh-chatbox-header">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="24" height="24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            <h3 class="ctxh-chatbox-title">Trợ lý Chuyên gia CTXH</h3>
+        </div>
+
+        <!-- Khung tin nhắn -->
+        <div id="chat-messages" class="ctxh-chatbox-messages">
+            <!-- Tin nhắn sẽ được chèn vào đây bởi JS -->
+        </div>
+
+        <!-- Input gửi tin nhắn -->
+        <div class="ctxh-chatbox-input-area">
+            <div class="ctxh-chatbox-input-group">
+                <input type="text" id="user-input" placeholder="Nhập câu hỏi tư vấn của bạn..."
+                    class="ctxh-chatbox-input">
+                <button id="send-button"
+                    class="ctxh-chatbox-button">
+                    Gửi
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- CHÚ Ý QUAN TRỌNG: CẦN THAY ĐỔI ĐƯỜNG DẪN NÀY ---
+    // Đường dẫn này phải trỏ đến file gemini-proxy.php trên server của bạn.
+    // Nếu file PHP nằm ở thư mục gốc, bạn có thể dùng '/gemini-proxy.php'
+    const PROXY_ENDPOINT = '/gemini-proxy.php'; 
+
+    // Các hằng số cho cấu hình (không chứa Key AI)
+    const MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
+    const systemPrompt = 'Bạn là một chuyên gia tư vấn trong lĩnh vực Công tác xã hội tại Việt Nam. Trả lời các câu hỏi của người dùng một cách chính xác, thân thiện, và dựa trên luật pháp cũng như thực tế xã hội Việt Nam. Duy trì một giọng văn chuyên nghiệp, đồng cảm và hỗ trợ. Khi không chắc chắn về thông tin, hãy nói rõ rằng bạn cần kiểm tra thêm và không đưa ra lời khuyên y tế hoặc pháp lý thay thế chuyên gia.';
+
+    let chatHistory = [];
+    let isSending = false;
+    let userInput, chatMessages, sendButton;
+
+    function initializeElements() {
+        userInput = document.getElementById('user-input');
+        chatMessages = document.getElementById('chat-messages');
+        sendButton = document.getElementById('send-button');
+
+        if (sendButton) sendButton.addEventListener('click', sendMessage);
+        if (userInput) userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        const welcomeMessage = "Chào bạn! Tôi là Trợ lý Tư vấn Công tác Xã hội. Đang kết nối an toàn...";
+        displayMessage(welcomeMessage, 'ai');
+        
+        // Khởi tạo và kiểm tra kết nối
+        testProxyConnection();
+
+        if (userInput) userInput.focus();
+    }
+    
+    // Hàm kiểm tra kết nối ban đầu
+    async function testProxyConnection() {
+        try {
+            const response = await fetch(PROXY_ENDPOINT, { method: 'OPTIONS' });
+            if (response.ok) {
+                // Kết nối thành công, hiển thị tin nhắn sẵn sàng
+                chatMessages.lastChild.remove(); // Xóa tin nhắn "Đang kết nối an toàn..."
+                const readyMessage = "Kết nối bảo mật thành công! Tôi đã sẵn sàng hỗ trợ bạn về các vấn đề xã hội tại Việt Nam. Bạn có câu hỏi nào không?";
+                displayMessage(readyMessage, 'ai');
+                chatHistory.push({ role: "model", parts: [{ text: readyMessage }] });
+            } else {
+                throw new Error("Proxy không phản hồi.");
+            }
+        } catch (error) {
+            chatMessages.lastChild.remove();
+            displayMessage('Lỗi: Không thể kết nối đến máy chủ Proxy. Vui lòng kiểm tra file PHP và đường dẫn PROXY_ENDPOINT.', 'ai');
+            console.error("Lỗi Proxy:", error);
+            if (sendButton) sendButton.disabled = true;
+            if (userInput) userInput.disabled = true;
+        }
+    }
+
+
+    function displayMessage(text, sender) {
+        if (!chatMessages) return;
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message-line ' + (sender === 'user' ? 'user-line' : 'ai-line');
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble ' + (sender === 'user' ? 'user-message' : 'ai-message');
+        bubble.innerHTML = text.replace(/\n/g, '<br>');
+
+        messageDiv.appendChild(bubble);
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    function showLoading() {
+        if (!chatMessages) return;
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message-line ai-line';
+
+        const loadingHtml =
+            '<div id="loading-indicator" class="message-bubble ai-message loading-dots">' +
+                '<div></div><div></div><div></div>' +
+            '</div>';
+        
+        messageDiv.innerHTML = loadingHtml;
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function hideLoading() {
+        const loadingIndicator = document.getElementById('loading-indicator');
+        if (loadingIndicator) {
+            loadingIndicator.parentElement.remove();
+        }
+    }
+
+    function sendMessage() {
+        if (isSending || !userInput) return;
+
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        displayMessage(text, 'user');
+        userInput.value = '';
+        showLoading();
+        isSending = true;
+        if (sendButton) sendButton.disabled = true;
+        if (userInput) userInput.disabled = true;
+
+        chatHistory.push({ role: "user", parts: [{ text: text }] });
+
+        callProxyAPI();
+    }
+
+    async function callProxyAPI(retries = 0) {
+        const dataToSend = {
+            contents: chatHistory,
+            systemInstruction: systemPrompt,
+            model: MODEL_NAME,
+        };
+
+        try {
+            const response = await fetch(PROXY_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dataToSend)
+            });
+
+            if (!response.ok) {
+                if (response.status === 429 && retries < 3) {
+                    const delay = Math.pow(2, retries) * 1000;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return callProxyAPI(retries + 1);
+                }
+                throw new Error('Lỗi Proxy Server: ' + response.status);
+            }
+
+            const result = await response.json();
+            let aiResponseText = "Xin lỗi, đã xảy ra lỗi từ phía máy chủ.";
+
+            if (result.text) {
+                aiResponseText = result.text;
+            }
+
+            hideLoading();
+            displayMessage(aiResponseText, 'ai');
+
+            chatHistory.push({ role: "model", parts: [{ text: aiResponseText }] });
+
+        } catch (error) {
+            console.error("Lỗi gọi Proxy API:", error);
+            hideLoading();
+            chatHistory.pop();
+            displayMessage('Lỗi: Không thể nhận phản hồi từ Proxy. Vui lòng kiểm tra console.', 'ai');
+
+        } finally {
+            isSending = false;
+            if (sendButton) sendButton.disabled = false;
+            if (userInput) {
+                userInput.disabled = false;
+                userInput.focus();
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeElements);
+</script>
+  </body>
+</html>
