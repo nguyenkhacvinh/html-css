@@ -11,7 +11,7 @@
     Nó chỉ gửi yêu cầu đến PROXY_ENDPOINT trên server của bạn.
 -->
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" type="text/css" href="/chatbox_styles_secured.css">
+<link rel="stylesheet" type="text/css" href="ChatbotAI/chatbox_styles_secured.css">
 <div class="ctxh-chatbox-wrapper">
     <div class="ctxh-chatbox-window">
         <!-- Header -->
@@ -45,7 +45,7 @@
     // --- CHÚ Ý QUAN TRỌNG: CẦN THAY ĐỔI ĐƯỜNG DẪN NÀY ---
     // Đường dẫn này phải trỏ đến file gemini-proxy.php trên server của bạn.
     // Nếu file PHP nằm ở thư mục gốc, bạn có thể dùng '/gemini-proxy.php'
-    const PROXY_ENDPOINT = '/gemini-proxy.php'; 
+    const PROXY_ENDPOINT = 'ChatbotAI/gemini-proxy.php'; 
 
     // Các hằng số cho cấu hình (không chứa Key AI)
     const MODEL_NAME = 'gemini-2.5-flash-preview-09-2025';
@@ -215,3 +215,4 @@
 </script>
   </body>
 </html>
+
